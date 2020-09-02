@@ -18,7 +18,7 @@ public class CadastrarActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastrar);
-        //teste
+        //teste 2
     }
 
     public void clickVoltar(View v){
