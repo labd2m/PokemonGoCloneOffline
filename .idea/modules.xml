@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PokemonGoCloneOffline.iml" filepath="$PROJECT_DIR$/PokemonGoCloneOffline.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PokemonGoCloneOfflineTestPullRequest.iml" filepath="$PROJECT_DIR$/PokemonGoCloneOfflineTestPullRequest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
