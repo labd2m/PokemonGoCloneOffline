@@ -27,9 +27,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+/////////////////////////////////////////04-ROTA/////////////////////////////////////////
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import directionshelpers.FetchURL;
+import directionshelpers.TaskLoadedCallback;
+/////////////////////////////////////////////////////////////////////////////////////////
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -42,11 +46,13 @@ import teste.lucasvegi.pokemongooffline.Model.Aparecimento;
 import teste.lucasvegi.pokemongooffline.Model.ControladoraFachadaSingleton;
 import teste.lucasvegi.pokemongooffline.R;
 
-public class MapActivity extends FragmentActivity implements LocationListener, GoogleMap.OnMarkerClickListener,Runnable {
+public class MapActivity extends FragmentActivity implements LocationListener, GoogleMap.OnMarkerClickListener,Runnable , /*04-ROTA*/TaskLoadedCallback/*04-ROTA*/ {
     public GoogleMap map;
     public LocationManager lm;
     public Criteria criteria;
     public String provider;
+
+    Polyline currentPolyline;//04-ROTA
 
     public int TEMPO_REQUISICAO_LATLONG = 5000;
     public int DISTANCIA_MIN_METROS = 0;
@@ -268,13 +274,37 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
                     Log.e("CliqueMarker","Erro: " + e.getMessage());
                 }
             }else{
+                /*
                 DecimalFormat df = new DecimalFormat("0.##");
                 Toast.makeText(this,"Você está a " + df.format(distanciaPkmn) + " metros do " + marker.getTitle() + ".\n" +
                         "Aproxime-se pelo menos " + df.format(distanciaPkmn - distanciaMin) + " metros!", Toast.LENGTH_LONG).show();
+                */
+                /////////////////////////////////////////04-ROTA/////////////////////////////////////////
+                String url = getDirectionsUrl(eu.getPosition(), marker.getPosition());
+                new FetchURL(MapActivity.this).execute(url);
+                /////////////////////////////////////////////////////////////////////////////////////////
             }
         }
         return false;
     }
+
+    /////////////////////////////////////////04-ROTA/////////////////////////////////////////
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+        // Origem da rota
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        // Destino da rota
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        // Mode
+        String mode = "mode=walking";
+        // Parametros para web service
+        String parameters = str_origin + "&" + str_dest + "&" + mode;
+        // Formato do output
+        String output = "json";
+        // Url
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.directions_key);
+        return url;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
 
     public void limparMarcadores(){
         try{
@@ -434,4 +464,13 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
         }
 
     }
+
+    /////////////////////////////////////////04-ROTA/////////////////////////////////////////
+    @Override
+    public void onTaskDone(Object... values) {
+        if(currentPolyline!=null)
+            currentPolyline.remove();
+        currentPolyline = map.addPolyline((PolylineOptions) values[0]);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
 }

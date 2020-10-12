@@ -1,2 +1,4 @@
 /build
 /src/main/res/values/directions_key.xml
+app.iml
+build.gradle
