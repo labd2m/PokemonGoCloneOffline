@@ -20,7 +20,7 @@ import java.util.List;
 
 public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
     TaskLoadedCallback taskCallback;
-    String directionMode = "driving";
+    String directionMode = "walking";
 
     public PointsParser(Context mContext, String directionMode) {
         this.taskCallback = (TaskLoadedCallback) mContext;
@@ -73,8 +73,8 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
             }
             // Adding all the points in the route to LineOptions
             lineOptions.addAll(points);
-            lineOptions.width(10);
-            lineOptions.color(Color.MAGENTA);
+            lineOptions.width(12);
+            lineOptions.color(Color.CYAN);
             Log.d("mylog", "onPostExecute lineoptions decoded");
         }
 
