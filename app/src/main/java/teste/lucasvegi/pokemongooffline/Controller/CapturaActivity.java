@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import teste.lucasvegi.pokemongooffline.Model.Aparecimento;
 import teste.lucasvegi.pokemongooffline.Model.ControladoraFachadaSingleton;
@@ -39,6 +40,7 @@ import teste.lucasvegi.pokemongooffline.View.CameraPreview;
 public class CapturaActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor sensor;
+    private Sensor accelerometer;
     public ImageView img;
     public ImageView pokebola;
     public int dimenX;  //dimensao horizontal da tela em pixel
@@ -121,6 +123,7 @@ public class CapturaActivity extends Activity implements SensorEventListener {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         //Obtem sensores a serem utilizados
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
         //Obtem a resolução da tela
         Display display = getWindowManager().getDefaultDisplay();
@@ -182,6 +185,10 @@ public class CapturaActivity extends Activity implements SensorEventListener {
             //Começa a escutar os sensores utilizados
             sensorManager.registerListener(this, sensor,SensorManager.SENSOR_DELAY_GAME);
         }
+
+        if (accelerometer != null) {
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        }
     }
 
     @Override
@@ -227,8 +234,63 @@ public class CapturaActivity extends Activity implements SensorEventListener {
         img.startAnimation(rotate);
     }
 
+    private HashMap<Integer, Long> timestamp = new HashMap<>();
+
+    private double getSensorElapsedSeconds(SensorEvent event) {
+        Long lastTimestamp = timestamp.put(event.sensor.getType(), event.timestamp);
+
+        if (lastTimestamp == null)
+            return 0;
+
+        return (event.timestamp - lastTimestamp) / 1000000000f;
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_GYROSCOPE:
+                onGyroscopeChanged(event);
+                break;
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                onAccelerationChanged(event);
+                break;
+            default:
+                throw new IllegalStateException("Unreachable");
+        }
+
+    }
+
+    double accelerationNoise, speed, distance;
+    long accelerationSamples;
+
+    private double clamp(double value, double min, double max) {
+        return value < min ? min : (value > max ? max : value);
+    }
+
+    private void onAccelerationChanged(SensorEvent event) {
+        double elapsed = getSensorElapsedSeconds(event);
+
+        double accelerationSensor = -event.values[2];
+        double accelerationSensorMagnitude = Math.abs(accelerationSensor);
+        double accelerationSensorDirection = Math.signum(accelerationSensor);
+
+        accelerationNoise += (1 / ++accelerationSamples) * (accelerationSensorMagnitude - accelerationNoise);
+
+        if (imagemPokemonPreparada && imagemPokeballPreparada) {
+            // Atenua o ruído na aceleração.
+            double acceleration = Math.max(accelerationSensorMagnitude - accelerationNoise, 0) * accelerationSensorDirection;
+
+            speed = clamp(speed + acceleration * elapsed, -0.25f, +0.25f);
+            distance = clamp(distance + speed * elapsed, 0.25f, 0.75f);
+
+            percentImagePokemon = 1f - (float) distance;
+            configuraPokemon();
+
+            Log.i("Accel", String.format("A=%.1f S=%.1f D=%.1f N=%.1f", acceleration, speed, distance, accelerationNoise));
+        }
+    }
+
+    public void onGyroscopeChanged(SensorEvent event) {
         if(imagemPokemonPreparada && imagemPokeballPreparada) {
             float xNovo = img.getX();
             float yNovo = img.getY();
