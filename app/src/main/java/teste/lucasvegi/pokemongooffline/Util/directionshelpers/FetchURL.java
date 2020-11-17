@@ -1,4 +1,4 @@
-package directionshelpers;
+package teste.lucasvegi.pokemongooffline.Util.directionshelpers;
 
 import android.content.Context;
 import android.os.AsyncTask;

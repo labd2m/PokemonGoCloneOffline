@@ -31,8 +31,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /////////////////////////////////////////04-ROTA/////////////////////////////////////////
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import directionshelpers.FetchURL;
-import directionshelpers.TaskLoadedCallback;
+import teste.lucasvegi.pokemongooffline.Util.directionshelpers.FetchURL;
+import teste.lucasvegi.pokemongooffline.Util.directionshelpers.TaskLoadedCallback;
 /////////////////////////////////////////////////////////////////////////////////////////
 
 import java.text.DecimalFormat;
@@ -274,11 +274,11 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
                     Log.e("CliqueMarker","Erro: " + e.getMessage());
                 }
             }else{
-                /*
+
                 DecimalFormat df = new DecimalFormat("0.##");
                 Toast.makeText(this,"Você está a " + df.format(distanciaPkmn) + " metros do " + marker.getTitle() + ".\n" +
                         "Aproxime-se pelo menos " + df.format(distanciaPkmn - distanciaMin) + " metros!", Toast.LENGTH_LONG).show();
-                */
+
                 /////////////////////////////////////////04-ROTA/////////////////////////////////////////
                 String url = getDirectionsUrl(eu.getPosition(), marker.getPosition());
                 new FetchURL(MapActivity.this).execute(url);
@@ -316,6 +316,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
 
             //limpa o dicionário de marcadores de aparecimentos
             aparecimentoMap.clear();
+            currentPolyline.remove();////04-ROTA////
         }catch (Exception e){
             Log.e("LimparMarker","ERRO: " + e.getMessage());
         }

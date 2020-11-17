@@ -1,4 +1,4 @@
-package directionshelpers;
+package teste.lucasvegi.pokemongooffline.Util.directionshelpers;
 
 import com.google.android.gms.maps.model.LatLng;
 
