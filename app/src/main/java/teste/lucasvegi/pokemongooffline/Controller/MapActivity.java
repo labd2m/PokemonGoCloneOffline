@@ -52,7 +52,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
     public Criteria criteria;
     public String provider;
 
-    Polyline currentPolyline;//04-ROTA
+    public Polyline currentPolyline;////04-ROTA
+    public Marker targetPkmn;////04-ROTA
 
     public int TEMPO_REQUISICAO_LATLONG = 5000;
     public int DISTANCIA_MIN_METROS = 0;
@@ -98,6 +99,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
         //aloca lista e Map
         aparecimentos = new ArrayList<Aparecimento>();
         aparecimentoMap = new HashMap<Marker, Aparecimento>();
+
+        targetPkmn = null;////04-ROTA
 
         //Configura web view loader sorteio de pokemon
         webViewLoader = (WebView) findViewById(R.id.imgLoader);
@@ -174,6 +177,17 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
         if(eu != null) {
             eu.remove();
         }
+
+        ////04-ROTA////
+        if(targetPkmn != null){
+            double distanciaPkmn = getDistanciaPkmn(eu, targetPkmn);
+            double distanciaMin = distanciaMinimaParaBatalhar;
+            if(distanciaPkmn <= distanciaMin){
+                Toast.makeText(this,"Você já está perto do " + targetPkmn.getTitle() + "!\n" +
+                        "Tente capturá-lo agora! ", Toast.LENGTH_LONG).show();
+            }
+        }
+        ///////////////
 
         //Escolhe imagem do personagem de acordo com o sexo
         if(ControladoraFachadaSingleton.getInstance().getUsuario().getSexo().equals("M"))
@@ -269,17 +283,24 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
 
                     startActivity(it);
 
+                    ////04-ROTA////
+                    if(marker.equals(targetPkmn)){
+                        if(currentPolyline != null)
+                            currentPolyline.remove();
+                        targetPkmn = null;
+                    }
+                    ///////////////
                     marker.remove();
                 }catch (Exception e){
                     Log.e("CliqueMarker","Erro: " + e.getMessage());
                 }
             }else{
-
                 DecimalFormat df = new DecimalFormat("0.##");
                 Toast.makeText(this,"Você está a " + df.format(distanciaPkmn) + " metros do " + marker.getTitle() + ".\n" +
                         "Aproxime-se pelo menos " + df.format(distanciaPkmn - distanciaMin) + " metros!", Toast.LENGTH_LONG).show();
 
                 /////////////////////////////////////////04-ROTA/////////////////////////////////////////
+                targetPkmn = marker;
                 String url = getDirectionsUrl(eu.getPosition(), marker.getPosition());
                 new FetchURL(MapActivity.this).execute(url);
                 /////////////////////////////////////////////////////////////////////////////////////////
@@ -317,6 +338,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
             //limpa o dicionário de marcadores de aparecimentos
             aparecimentoMap.clear();
             currentPolyline.remove();////04-ROTA////
+            targetPkmn = null;////04-ROTA////
         }catch (Exception e){
             Log.e("LimparMarker","ERRO: " + e.getMessage());
         }
@@ -469,8 +491,9 @@ public class MapActivity extends FragmentActivity implements LocationListener, G
     /////////////////////////////////////////04-ROTA/////////////////////////////////////////
     @Override
     public void onTaskDone(Object... values) {
-        if(currentPolyline!=null)
+        if(currentPolyline!=null) {
             currentPolyline.remove();
+        }
         currentPolyline = map.addPolyline((PolylineOptions) values[0]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////
