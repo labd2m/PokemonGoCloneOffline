@@ -105,7 +105,7 @@ ___
 
 The video below (pt-BR) shows the complete app in action. 
 
-[![Pokémon GO Clone presentation](https://i9.ytimg.com/vi/akgI7fmcn4E/sddefault.jpg?v=5fcc21b7&sqp=CJSkwJ4G&rs=AOn4CLCPfeIPBoz1MeKd4xDX6aermqDF9Q)](https://www.youtube.com/embed/akgI7fmcn4E)
+[![Pokémon GO Clone presentation](https://user-images.githubusercontent.com/17458700/214458048-0630f62b-dcef-42ec-9943-c4d17a2be21a.png)](https://www.youtube.com/embed/akgI7fmcn4E)
 
 [▲ back to Index](#table-of-contents)
 
